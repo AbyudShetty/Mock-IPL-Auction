@@ -1,0 +1,37 @@
+# Logs
+logs
+*.log
+firebase-debug.log*
+
+# Firebase
+.firebase/
+.firebaserc
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output (if any)
+dist/
+build/

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goated Auction</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://goated-auction-2b1d8.web.app/">
+    <meta property="og:title" content="Goated Auction!!">
+    <meta property="og:description" content="Click here to join the room...">
+    <meta property="og:image" content="https://goated-auction-2b1d8.web.app/logo.png">
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://goated-auction-2b1d8.web.app/">
+    <meta property="twitter:title" content="Goated Auction!!">
+    <meta property="twitter:description" content="Click here to join the room...">
+    <meta property="twitter:image" content="https://goated-auction-2b1d8.web.app/logo.png">
+    <link rel="stylesheet" href="styles.css">   
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">🐐 GOATED AUCTION 🐐</h1>
+        
+        <!-- MODE SELECTION SCREEN -->
+        <div id="mode-selection" style="display: flex;">
+            <div class="setup-card">
+                <h2 class="setup-heading">🎮 Choose Game Mode</h2>
+                
+                <div class="mode-selector">
+                    <label class="mode-option">
+                        <input type="radio" name="game-mode" value="online" checked>
+                        <span class="mode-card">
+                            <span class="mode-icon">🌐</span>
+                            <span class="mode-title">Online Multiplayer</span>
+                            <span class="mode-desc">Play with friends remotely</span>
+                        </span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="game-mode" value="offline">
+                        <span class="mode-card">
+                            <span class="mode-icon">💻</span>
+                            <span class="mode-title">Offline Local</span>
+                            <span class="mode-desc">Play on same device</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <button id="mode-continue-button" class="primary-button">
+                    <span>Continue</span>
+                    <span class="button-icon">➡️</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- ONLINE MODE: CREATE OR JOIN -->
+        <div id="online-choice" style="display: none;">
+            <div class="setup-card">
+                <h2 class="setup-heading">🌐 Online Multiplayer</h2>
+                
+                <div class="mode-selector">
+                    <label class="mode-option">
+                        <input type="radio" name="online-mode" value="create" checked>
+                        <span class="mode-card">
+                            <span class="mode-icon">➕</span>
+                            <span class="mode-title">Create Room</span>
+                            <span class="mode-desc">Host the auction</span>
+                        </span>
+                    </label>
+                    <label class="mode-option">
+                        <input type="radio" name="online-mode" value="join">
+                        <span class="mode-card">
+                            <span class="mode-icon">🔗</span>
+                            <span class="mode-title">Join Room</span>
+                            <span class="mode-desc">Enter with code</span>
+                        </span>
+                    </label>
+                </div>
+                
+                <button id="online-choice-button" class="primary-button" onclick="handleOnlineChoice()">
+                    <span>Continue</span>
+                    <span class="button-icon">➡️</span>
+                </button>
+                
+                <button class="secondary-button" onclick="backToModeSelection()" style="margin-top: 10px; width: 100%;">
+                    ← Back
+                </button>
+            </div>
+        </div>
+        
+        <!-- JOIN ROOM SCREEN -->
+        <div id="join-room-screen" style="display: none;">
+            <div class="setup-card">
+                <h2 class="setup-heading">🔗 Join Auction</h2>
+                
+                <div class="input-group">
+                    <label for="join-room-code">🎯 Room Code</label>
+                    <input type="text" id="join-room-code" placeholder="Enter 6-digit code" maxlength="6" style="text-transform: uppercase;">
+                </div>
+                
+                <div class="input-group">
+                    <label for="join-team-name">👤 Your Team Name</label>
+                    <input type="text" id="join-team-name" placeholder="Enter your team name">
+                </div>
+                
+                <button id="join-room-button" class="primary-button" onclick="handleJoinRoom()">
+                    <span>Join Room</span>
+                    <span class="button-icon">🚀</span>
+                </button>
+                
+                <button class="secondary-button" onclick="backToOnlineChoice()" style="margin-top: 10px; width: 100%;">
+                    ← Back
+                </button>
+            </div>
+        </div>
+        
+        <!-- WAITING LOBBY SCREEN -->
+        <div id="waiting-lobby" style="display: none;">
+            <div class="setup-card" style="max-width: 700px; position: relative;">
+                <button id="edit-config-button" class="edit-config-btn" onclick="openConfigEditor()" title="Edit Configuration" style="display: none;">
+                    ⚙️ Edit Config
+                </button>
+                
+                <h2 class="setup-heading">⏳ Waiting Lobby</h2>
+                
+                <div class="room-info-box">
+                    <div class="room-code-display">
+                        <span class="room-code-label">Room Code:</span>
+                        <span id="display-room-code" class="room-code-value">------</span>
+                        <button id="copy-code-button" class="copy-code-btn" onclick="copyRoomCode()">📋 Copy</button>
+                    </div>
+                    
+                    <div class="room-link-display">
+                        <span class="room-link-label">Share Link:</span>
+                        <input type="text" id="room-link-input" readonly>
+                        <button id="copy-link-button" class="copy-link-btn" onclick="copyRoomLink()">📋 Copy Link</button>
+                    </div>
+                </div>
+                
+                <div class="lobby-status">
+                    <h3>👥 Teams Joined: <span id="teams-joined-count">1</span> / <span id="teams-total-count">0</span></h3>
+                </div>
+                
+                <div id="lobby-teams-list" class="lobby-teams-container">
+                    </div>
+                
+                <button id="start-auction-button" class="primary-button" onclick="startAuctionFromLobby()" style="display: none;">
+                    <span>Start Auction</span>
+                    <span class="button-icon">🎬</span>
+                </button>
+                
+                <div class="lobby-waiting-message" id="lobby-waiting-message">
+                    <p>⏳ Waiting for all teams to join...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- INITIAL SETUP (Same as before, but modified for auctioneer) -->
+        <div id="initial-setup" style="display: none;">
+            <div class="setup-card">
+                <h2 class="setup-heading">⚙️ Auction Configuration</h2>
+                
+                <div class="input-group" id="auctioneer-name-group">
+                    <label for="auctioneer-name">👤 Your Team Name (Auctioneer)</label>
+                    <input type="text" id="auctioneer-name" placeholder="Enter your team name">
+                </div>
+                
+                <div class="input-group">
+                    <label for="team-count">👥 Number of Teams</label>
+                    <input type="number" id="team-count" placeholder="2-10 teams" min="2" max="10">
+                </div>
+                
+                <div class="input-group">
+                    <label for="team-budget">💰 Budget per Team (Crores)</label>
+                    <input type="number" id="team-budget" placeholder="e.g., 120" min="1">
+                </div>
+                
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="min-players">📊 Min Players</label>
+                        <input type="number" id="min-players" placeholder="Min 12" min="12">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="max-players">📈 Max Players</label>
+                        <input type="number" id="max-players" placeholder="e.g., 20" min="12">
+                    </div>
+                </div>
+                
+                <div class="mode-selector-container">
+                    <h3 class="mode-heading">🎯 Player Mode</h3>
+                    <div class="mode-selector">
+                        <label class="mode-option">
+                            <input type="radio" name="player-mode" value="default" checked>
+                            <span class="mode-card">
+                                <span class="mode-icon">📋</span>
+                                <span class="mode-title">Default Players</span>
+                                <span class="mode-desc">Pre-loaded IPL stars</span>
+                            </span>
+                        </label>
+                        <label class="mode-option">
+                            <input type="radio" name="player-mode" value="custom">
+                            <span class="mode-card">
+                                <span class="mode-icon">✨</span>
+                                <span class="mode-title">Custom Players</span>
+                                <span class="mode-desc">Create your own sets</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button id="setup-button" class="primary-button" onclick="handleSetupContinue()">
+                    <span>Continue</span>
+                    <span class="button-icon">🚀</span>
+                </button>
+                
+                <button class="secondary-button" onclick="backFromSetup()" style="margin-top: 10px; width: 100%;">
+                    ← Back
+                </button>
+            </div>
+        </div>
+        
+        <!-- Custom Player Sets Interface (same as before) -->
+        <div id="custom-players-setup" style="display: none;">
+            <h2 class="page-title">Configure Player Sets</h2>
+            <div class="custom-actions-top">
+                <button id="load-default-button" onclick="loadDefaultSets()" class="secondary-button">
+                    🔥 Load Default Sets
+                </button>
+            </div>
+            
+            <div class="set-creation-controls">
+                <select id="set-type-select">
+                    <option value="">Select Set Type</option>
+                    <option value="Marquee">⭐ Marquee (Mixed - Tags Required)</option>
+                    <option value="Wicket Keeper">🧤 Wicket Keeper</option>
+                    <option value="Batsman">🏏 Batsman</option>
+                    <option value="Fast Bowler">⚡ Fast Bowler</option>
+                    <option value="Spinner">🌀 Spinner</option>
+                    <option value="All-rounder">🔀 All-rounder</option>
+                </select>
+                <button id="add-set-button" onclick="addNewSet()">➕ Add Set</button>
+            </div>
+            
+            <div id="sets-container"></div>
+            
+            <div class="setup-actions">
+                <button id="back-to-setup-button" onclick="backToInitialSetup()">← Back</button>
+                <button id="confirm-custom-button" onclick="confirmCustomPlayers()">Confirm & Continue →</button>
+            </div>
+        </div>
+        
+        <!-- Auction Interface (same as before) -->
+        <div id="auction-interface" style="display: none;">
+            <div id="current-player">
+                <p><strong>Current Set:</strong> <span id="current-set"></span></p>
+                
+                <div class="player-control-container">
+                    <button id="global-undo-button" onclick="triggerGlobalUndo()" title="Undo Last Action">←</button>
+                    <button id="current-player-name" draggable="true">Click to Start</button>
+                    <button id="view-stats-button" type="button" title="View Player Stats">View Stats</button>
+                    <button id="next-player-button" onclick="nextPlayer()">Next Player</button>
+                </div>
+
+                <div id="current-player-hero">
+                    <img id="current-player-hero-img" src="https://scores.iplt20.com/ipl/images/default-player-statsImage.png" alt="Current player" />
+                </div>
+
+                <div id="remaining-in-set" style="margin-top: 15px; font-size: 13px; color: #a0a0c0;"></div>
+            </div>
+            <div id="remaining-players" style="margin-top: 10px; font-size: 14px; color: #a0a0c0;"></div>
+        </div>
+        
+        <div id="teams-container"></div>
+        
+        <!-- Statistics Panel -->
+        <div id="stats-panel" style="display: none;">
+            <h3>📊 Auction Statistics</h3>
+            
+            <div class="global-search-container">
+                <input type="text" id="global-player-search" placeholder="🔍 Search any player (e.g., Virat Kohli, Starc)..." autocomplete="off">
+                <div id="search-results-dropdown" class="search-dropdown" style="display: none;"></div>
+            </div>
+
+            <div id="stats-content"></div>
+        </div>
+        
+        <!-- Upcoming Sets Panel -->
+        <div id="upcoming-sets-container" style="display: none;">
+            <h3>📅 Upcoming Sets</h3>
+            <div id="upcoming-sets-list"></div>
+        </div>
+        
+        <!-- Unsold Players Panel -->
+        <div id="unsold-players-container" style="display: none;">
+            <h3>📦 Unsold Players</h3>
+            <div id="unsold-players-list"></div>
+        </div>
+        
+        <!-- Reset Controls -->
+        <div id="reset-controls" style="display: none;">
+            <button id="restart-auction-button" onclick="restartAuction()">Restart Auction</button>
+            <button id="reset-auction-button" onclick="resetAuction()">Reset Auction</button>
+        </div>
+    </div>
+    
+    <!-- Price Modal -->
+    <div id="price-modal" class="modal">
+        <div class="modal-content">
+            <p id="modal-player-name"></p>
+            <p id="modal-team-name"></p>
+            <input type="number" id="price-input" placeholder="Enter Price (in Crores)" min="1" autofocus>
+            <div class="modal-buttons">
+                <button id="confirm-price">Confirm</button>
+                <button id="cancel-price">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="move-player-modal" class="modal">
+        <div class="modal-content">
+            <h3>🔄 Correction: Move Player</h3>
+            <p id="move-player-name" style="color: #27ae60; font-weight: bold; font-size: 18px;"></p>
+            <p style="font-size: 13px;">Currently in: <span id="move-current-team" style="color: #e74c3c; font-weight: bold;"></span></p>
+            
+            <div style="width: 100%; text-align: left; margin-top: 15px;">
+                <label style="font-size: 11px; color: #a0a0c0; text-transform: uppercase; font-weight: 600;">New Price (Crores)</label>
+                <input type="number" id="move-player-price" step="0.25" style="margin-top: 5px;">
+            </div>
+            
+            <div style="width: 100%; text-align: left; margin-top: 15px;">
+                <label style="font-size: 11px; color: #a0a0c0; text-transform: uppercase; font-weight: 600;">Move To Team</label>
+                <select id="move-target-team" style="width: 100%; padding: 10px; margin-top: 5px; background: #1e1e2f; color: white; border: 2px solid #444; border-radius: 6px; font-family: inherit;">
+                    </select>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button id="confirm-move-player">Confirm Move</button>
+                <button id="cancel-move-player" style="background-color: #e74c3c;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="player-stats-modal" class="modal">
+        <div class="modal-content stats-modal-content">
+            <button id="close-player-stats" class="close-stats-btn" type="button">&times;</button>
+            <div id="live-stats-card" class="broadcast-card" style="display: block;">
+                <div class="card-header">
+                    <img id="stats-player-img" src="https://ui-avatars.com/api/?name=Player&background=2a2a40&color=fff&size=128" alt="Player">
+                    <div class="header-info">
+                        <h3 id="stats-name">Player Name</h3>
+                        <span id="stats-role-badge" class="role-badge">ROLE</span>
+                        <p id="stats-age" style="display:none; margin: 6px 0 0 0; font-size: 12px; color: #b9d8ff; font-weight: 600;"></p>
+                    </div>
+                </div>
+                <div id="stats-metrics-container" class="stats-sections"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="unsold-round-modal" class="modal-overlay"> <div class="modal-content text-center" style="position: relative;">
+            <span class="close-modal-x" onclick="closeUnsoldRoundModal()">&times;</span>
+
+            <h3>🔄 Round 1 Completed!</h3>
+            <p style="font-size: 16px; color: #a0a0c0; margin: 15px 0;">
+                All sets have been auctioned.<br>
+                <strong>Starting Unsold Player Round.</strong>
+            </p>
+            <button id="close-unsold-modal-btn" onclick="closeUnsoldRoundModal()">Let's Go 🚀</button>
+        </div>
+    </div>
+    
+    <!-- Team Management Modal -->
+    <div id="team-management-modal" class="modal">
+        <div class="team-management-content">
+            <div class="modal-header">
+                <h2 id="management-team-name"></h2>
+                <div class="modal-actions">
+                    <button id="copy-lineup-button" class="copy-lineup-btn">📋 Copy Lineup</button>
+                    <button id="close-management-modal" class="close-btn">&times;</button>
+                </div>
+            </div>
+            <div class="team-management-container">
+                <div class="playing-xi">
+                    <h3>Playing XII <span id="xi-count">(0/12)</span></h3>
+                    <div id="playing-xi-list" class="player-list">
+                        <div class="player-slot" data-slot="1">Slot 1</div>
+                        <div class="player-slot" data-slot="2">Slot 2</div>
+                        <div class="player-slot" data-slot="3">Slot 3</div>
+                        <div class="player-slot" data-slot="4">Slot 4</div>
+                        <div class="player-slot" data-slot="5">Slot 5</div>
+                        <div class="player-slot" data-slot="6">Slot 6</div>
+                        <div class="player-slot" data-slot="7">Slot 7</div>
+                        <div class="player-slot" data-slot="8">Slot 8</div>
+                        <div class="player-slot" data-slot="9">Slot 9</div>
+                        <div class="player-slot" data-slot="10">Slot 10</div>
+                        <div class="player-slot" data-slot="11">Slot 11</div>
+                        <div class="player-slot" data-slot="12">Slot 12</div>
+                    </div>
+                </div>
+                <div class="bench">
+                    <h3>Bench</h3>
+                    <div id="bench-list" class="player-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase SDK (CDN) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCGttdntn43ZHxoOj6R11HVyeFh5GwmsdQ",
+            authDomain: "goated-auction-2b1d8.firebaseapp.com",
+            databaseURL: "https://goated-auction-2b1d8-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "goated-auction-2b1d8",
+            storageBucket: "goated-auction-2b1d8.firebasestorage.app",
+            messagingSenderId: "340389456470",
+            appId: "1:340389456470:web:b6af3e6bd6ea9de45029f7",
+            measurementId: "G-FDRJZEGYW1"
+        };
+        
+        window.firebaseApp = initializeApp(firebaseConfig);
+        window.firebaseDatabase = getDatabase(window.firebaseApp);
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
