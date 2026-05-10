@@ -113,6 +113,8 @@ No build tools needed. Clone and open directly in a browser, or serve with any s
 git clone https://github.com/AbyudShetty/Mock-IPL-Auction.git
 cd Mock-IPL-Auction/public
 
+/* use your API KEY in index.html */
+
 # Option A: Python
 python3 -m http.server 8000
 
