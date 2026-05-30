@@ -35,3 +35,6 @@ Thumbs.db
 # Build output (if any)
 dist/
 build/
+
+#json files
+*.json
