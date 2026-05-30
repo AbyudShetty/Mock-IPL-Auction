@@ -38,3 +38,6 @@ build/
 
 #json files
 *.json
+
+#repomix files
+repomix-output.md
