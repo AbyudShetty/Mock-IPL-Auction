@@ -17,6 +17,19 @@ export const defaultPlayers = {
   "Fast Bowler 4": ["Dushmantha Chameera ✈️", "Nuwan Thushara ✈️", "Nandre Burger ✈️", "Kyle Jamieson ✈️", "Tushar Deshpande", "Nathan Ellis ✈️", "Umran Malik", "Mohsin Khan", "Rasikh Dar", "Vaibhav Arora"],
 };
 
+/* OLD
+const defaultPlayers = {
+    "Wicket Keepers": ["MS Dhoni", "Rishabh Pant", "Quinton De Kock ✈️", "Jos Buttler ✈️", "Dinesh Karthik", "Robin Uthappa", "Parthiv Patel", "KL Rahul", "Wriddhiman Saha", "Sanju Samson", "Naman Ojha", "Ishan Kishan"],
+    "Batsmen 1": ["Rohit Sharma", "Virat Kohli", "Shikhar Dhawan", "Gautam Gambhir", "Shreyas Iyer", "Suresh Raina", "Ambati Rayudu", "Suryakumar Yadav", "Virender Sehwag", "Ajinkya Rahane", "Manish Pandey", "Sachin Tendulkar", "Rahul Dravid", "Sourav Ganguly", "Murali Vijay"],
+    "Fast Bowlers 1": ["Jasprit Bumrah", "Mohammad Shami", "Bhuvaneshwar Kumar", "Zaheer Khan", "Mohit Sharma", "Umesh Yadav", "Vinay Kumar", "Ishant Sharma", "Ashish Nehra", "Praveen Kumar", "RP Singh", "Munaf Patel", "Sidharth Kaul"],
+    "Spinners": ["Yuzvendra Chahal", "Kuldeep Yadav", "Rashid Khan ✈️", "Amit Mishra", "Harbhajan Singh", "Piyush Chawla", "Karn Sharma", "Imran Tahir ✈️", "Varun Chakravarthy", "Adam Zampa ✈️", "Anil Kumble", "Pragyan Ojha", "Murali Kartik"],
+    "All-rounders 1": ["Ravindra Jadeja", "Ravichandran Ashwin", "Hardik Pandya", "Krunal Pandya", "Axar Patel", "Yusuf Pathan", "Stuart Binny", "Yuvraj Singh", "Kedar Jhadav", "Harshal Patel", "Irfan Pathan", "Rishi Dhawan"],
+    "Batsmen 2": ["Faf Du Plessis ✈️", "Eoin Morgan ✈️", "David Miller ✈️", "Brendon McCullum ✈️", "AB De Villiers ✈️", "Martin Guptill ✈️", "Chris Gayle ✈️", "David Warner ✈️", "Aaron Finch ✈️", "Kane Williamson ✈️"],
+    "Fast Bowlers 2": ["Mitchell Starc ✈️", "Tim Southee ✈️", "Pat Cummins ✈️", "James Faulkner ✈️", "DJ Bravo ✈️", "Dale Steyn ✈️", "Mitchell Johnson ✈️", "Morne Morkel ✈️", "Lasith Malinga ✈️", "Trent Boult ✈️"],
+    "All-rounders 2": ["Glenn Maxwell ✈️", "Darren Sammy ✈️", "Sunil Narine ✈️", "JP Duminy ✈️", "Andre Russell ✈️", "Shane Watson ✈️", "Carlos Braithwaite ✈️", "Ben Stokes ✈️", "Daniel Vettori ✈️", "Kieron Pollard ✈️"]
+}
+*/
+
 export const IPL_2026_COMPETITION_ID = '284';
 export const IPL_STATS_BASE = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats';
 export const OFFICIAL_2026_LOCAL_FILE = 'official_ipl_2026_stats.json';
