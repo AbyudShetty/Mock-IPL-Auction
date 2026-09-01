@@ -11,7 +11,7 @@ SEASONS = {
     "2025": "203",
     "2024": "148",
 }
-OUT_DIR = Path(__file__).resolve().parents[1] / "public"
+OUT_DIR = Path(__file__).resolve().parent / "public"
 CSV_PATH = OUT_DIR / "cricket_data_2026.csv"
 
 BOWLING_FEEDS = [

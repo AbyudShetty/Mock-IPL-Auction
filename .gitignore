@@ -9,9 +9,12 @@ firebase-debug.log*
 
 # Dependencies
 node_modules/
+functions/node_modules/
 
 # Environment
 .env
+.env.local
+.env.*.local
 env.js
 
 # Editor/IDE
@@ -27,18 +30,15 @@ __pycache__/
 *.pyd
 .Python
 venv/
-.env/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Build output (if any)
+# Build output
 dist/
 build/
 
-#json files
-*.json
+# The bundled stats snapshots (public/official_ipl_*.json) ARE tracked so a
+# fresh clone runs without first running refresh_official_stats.py.
+# public/json/ is an unused duplicate of them — not tracked, not needed.
+public/json/
 
-#repomix files
+# repomix
 repomix-output.md

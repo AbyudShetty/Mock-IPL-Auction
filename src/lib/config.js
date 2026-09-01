@@ -32,10 +32,10 @@ const defaultPlayers = {
 
 export const IPL_2026_COMPETITION_ID = '284';
 export const IPL_STATS_BASE = 'https://ipl-stats-sports-mechanic.s3.ap-south-1.amazonaws.com/ipl/feeds/stats';
-export const OFFICIAL_2026_LOCAL_FILE = 'official_ipl_2026_stats.json';
-export const OFFICIAL_2025_LOCAL_FILE = 'official_ipl_2025_stats.json';
-export const OFFICIAL_2024_LOCAL_FILE = 'official_ipl_2024_stats.json';
-export const OFFICIAL_CAREER_LOCAL_FILE = 'official_ipl_career_stats.json';
+export const OFFICIAL_2026_LOCAL_FILE = '/official_ipl_2026_stats.json';
+export const OFFICIAL_2025_LOCAL_FILE = '/official_ipl_2025_stats.json';
+export const OFFICIAL_2024_LOCAL_FILE = '/official_ipl_2024_stats.json';
+export const OFFICIAL_CAREER_LOCAL_FILE = '/official_ipl_career_stats.json';
 export const IPL_2026_FEEDS = {
   batting: `${IPL_STATS_BASE}/${IPL_2026_COMPETITION_ID}-toprunsscorers.js`,
   bowling: `${IPL_STATS_BASE}/${IPL_2026_COMPETITION_ID}-mostwickets.js`

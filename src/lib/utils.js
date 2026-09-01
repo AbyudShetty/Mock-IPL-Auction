@@ -1,5 +1,13 @@
-import { S } from './state.js';
-import { playerNameAliases, playerImageNameAliases, whiteBackgroundPlayers, PLAYER_PLACEHOLDER_IMAGE, STATS_SEASONS } from './config.js';
+import {
+  playerNameAliases,
+  playerImageNameAliases,
+  whiteBackgroundPlayers,
+  PLAYER_PLACEHOLDER_IMAGE
+} from './config.js';
+
+// =====================================================================
+// STAT VALUE PARSING / FORMATTING
+// =====================================================================
 
 export function parseStatNumber(value) {
   const cleaned = String(value || '').trim();
@@ -33,7 +41,7 @@ export function parseBestBowling(value) {
   };
 }
 
-export function normalizeCareerBestBowling(value, wickets, runsConceded) {
+export function normalizeCareerBestBowling(value, wickets) {
   const text = String(value || '').trim();
   const wkts = parseStatNumber(wickets);
 
@@ -57,9 +65,7 @@ export function normalizeCareerBestBowling(value, wickets, runsConceded) {
     }
   }
 
-  if (wkts > 0) {
-    return 'NA';
-  }
+  if (wkts > 0) return 'NA';
 
   return noStatValue();
 }
@@ -73,33 +79,6 @@ export function formatStatValue(value, digits = 2) {
   }
   if (!Number.isFinite(value)) return noStatValue();
   return Number.isInteger(value) ? String(value) : value.toFixed(digits);
-}
-
-export function isNoStatYearData(yearData) {
-  if (!yearData) return true;
-  const batting = yearData.batting || {};
-  const bowling = yearData.bowling || {};
-
-  const battingHasData =
-    parseStatNumber(batting.innings) > 0 ||
-    parseStatNumber(batting.runs) > 0 ||
-    parseStatNumber(batting.ballsFaced) > 0 ||
-    parseStatNumber(batting.fours) > 0 ||
-    parseStatNumber(batting.sixes) > 0 ||
-    parseStatNumber(batting.fifties) > 0 ||
-    parseStatNumber(batting.hundreds) > 0 ||
-    parseStatNumber(batting.catches) > 0 ||
-    parseStatNumber(batting.stumpings) > 0;
-
-  const bowlingHasData =
-    parseStatNumber(bowling.innings) > 0 ||
-    parseStatNumber(bowling.wickets) > 0 ||
-    parseStatNumber(bowling.runsConceded) > 0 ||
-    parseStatNumber(bowling.ballsBowled) > 0 ||
-    parseStatNumber(bowling.fourW) > 0 ||
-    parseStatNumber(bowling.fiveW) > 0;
-
-  return !(battingHasData || bowlingHasData);
 }
 
 export function hasAnyYearStats(yearData) {
@@ -129,6 +108,14 @@ export function hasAnyYearStats(yearData) {
   return batHas || bowlHas;
 }
 
+export function isNoStatYearData(yearData) {
+  return !hasAnyYearStats(yearData);
+}
+
+// =====================================================================
+// PLAYER NAME HANDLING
+// =====================================================================
+
 export function sanitizeDisplayPlayerName(name) {
   return String(name || '')
     .replace(/\uFE0F/g, '')
@@ -147,18 +134,25 @@ export function normalizePlayerName(name) {
     .toLowerCase();
 }
 
+export const OVERSEAS_MARKER = '\u2708';
+
+/** A player is overseas when their original pool entry carries the plane marker. */
+export function isOverseasEntry(fullEntry) {
+  return String(fullEntry || '').includes(OVERSEAS_MARKER);
+}
+
 export function extractPlayerName(fullEntry) {
   const parsed = parsePlayerEntry(fullEntry);
-  return parsed.name || fullEntry.split(' - ')[0].trim();
+  return parsed.name || String(fullEntry).split(' - ')[0].trim();
 }
 
 export function tagToCategory(tag) {
   const tagMap = {
-    'wk': 'Wicket Keeper',
-    'b': 'Batsman',
-    'fb': 'Fast Bowler',
-    's': 'Spinner',
-    'ar': 'All-rounder'
+    wk: 'Wicket Keeper',
+    b: 'Batsman',
+    fb: 'Fast Bowler',
+    s: 'Spinner',
+    ar: 'All-rounder'
   };
   return tagMap[tag] || 'Batsman';
 }
@@ -168,6 +162,7 @@ export function shuffleArray(array) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
+  return array;
 }
 
 export function getTeamLineupKey(teamName) {
@@ -175,19 +170,20 @@ export function getTeamLineupKey(teamName) {
 }
 
 export function getSetTypeFromName(setName) {
-  if (setName.includes("Marquee")) return "Marquee";
-  if (setName.includes("Wicket Keeper")) return "Wicket Keeper";
-  if (setName.includes("Batsman")) return "Batsman";
-  if (setName.includes("Fast Bowler")) return "Fast Bowler";
-  if (setName.includes("Spinner")) return "Spinner";
-  if (setName.includes("All-rounder")) return "All-rounder";
-  return "Batsman";
+  const name = String(setName || '');
+  if (name.includes('Marquee')) return 'Marquee';
+  if (name.includes('Wicket Keeper')) return 'Wicket Keeper';
+  if (name.includes('Batsman')) return 'Batsman';
+  if (name.includes('Fast Bowler')) return 'Fast Bowler';
+  if (name.includes('Spinner')) return 'Spinner';
+  if (name.includes('All-rounder')) return 'All-rounder';
+  return 'Batsman';
 }
 
 export function parsePlayerEntry(entry, setType = null) {
-  const trimmed = entry.trim();
+  const trimmed = String(entry || '').trim();
   if (!trimmed) {
-    return { name: "", tag: null, isValid: false, error: "Player name is empty" };
+    return { name: '', tag: null, isValid: false, error: 'Player name is empty' };
   }
 
   const dashIndex = trimmed.indexOf('-');
@@ -196,69 +192,72 @@ export function parsePlayerEntry(entry, setType = null) {
     const afterDash = trimmed.substring(dashIndex + 1).trim();
 
     if (!afterDash) {
-      return { name: beforeDash, normalizedName: normalizePlayerName(beforeDash), tag: null, isValid: false, error: "Missing tag after dash" };
+      return {
+        name: beforeDash,
+        normalizedName: normalizePlayerName(beforeDash),
+        tag: null,
+        isValid: false,
+        error: 'Missing tag after dash'
+      };
     }
     if (!beforeDash) {
-      return { name: "", normalizedName: "", tag: null, isValid: false, error: "Missing player name before dash" };
+      return { name: '', normalizedName: '', tag: null, isValid: false, error: 'Missing player name before dash' };
     }
 
     const tag = afterDash.toLowerCase();
     const validTags = ['wk', 'b', 'fb', 's', 'ar'];
 
     if (!validTags.includes(tag)) {
-      return { name: beforeDash, normalizedName: normalizePlayerName(beforeDash), tag: tag, isValid: false, error: `Invalid tag "${afterDash}"` };
+      return {
+        name: beforeDash,
+        normalizedName: normalizePlayerName(beforeDash),
+        tag,
+        isValid: false,
+        error: `Invalid tag "${afterDash}"`
+      };
     }
 
-    return { name: beforeDash, normalizedName: normalizePlayerName(beforeDash), tag: tag, isValid: true, error: null };
-  } else {
-    const name = trimmed;
-    if (setType === "Marquee") {
-      return { name: name, normalizedName: normalizePlayerName(name), tag: null, isValid: false, error: "Marquee set requires tags (use: Name - tag)" };
-    }
+    return { name: beforeDash, normalizedName: normalizePlayerName(beforeDash), tag, isValid: true, error: null };
+  }
 
-    const setTypeToTag = {
-      "Wicket Keeper": 'wk',
-      "Batsman": 'b',
-      "Fast Bowler": 'fb',
-      "Spinner": 's',
-      "All-rounder": 'ar'
+  const name = trimmed;
+  if (setType === 'Marquee') {
+    return {
+      name,
+      normalizedName: normalizePlayerName(name),
+      tag: null,
+      isValid: false,
+      error: 'Marquee set requires tags (use: Name - tag)'
     };
-
-    const autoTag = setTypeToTag[setType] || 'b';
-    return { name: name, normalizedName: normalizePlayerName(name), tag: autoTag, isValid: true, error: null, autoTagged: true };
   }
+
+  const setTypeToTag = {
+    'Wicket Keeper': 'wk',
+    Batsman: 'b',
+    'Fast Bowler': 'fb',
+    Spinner: 's',
+    'All-rounder': 'ar'
+  };
+
+  const autoTag = setTypeToTag[setType] || 'b';
+  return { name, normalizedName: normalizePlayerName(name), tag: autoTag, isValid: true, error: null, autoTagged: true };
 }
 
-export function detachAllListeners() {
-  S.firebaseListeners.forEach(unsubscribe => {
-    if (typeof unsubscribe === 'function') {
-      unsubscribe();
-    }
-  });
-  S.firebaseListeners = [];
-}
-
-export function getSectionByCategory(teamDiv, category) {
-  switch(category) {
-    case 'Wicket Keeper': return teamDiv.querySelector('.wicket-keepers');
-    case 'Batsman': return teamDiv.querySelector('.batsmen');
-    case 'Fast Bowler': return teamDiv.querySelector('.fast-bowlers');
-    case 'Spinner': return teamDiv.querySelector('.spinners');
-    case 'All-rounder': return teamDiv.querySelector('.all-rounders');
-    default: return teamDiv.querySelector('.batsmen');
-  }
-}
-
+/** Category for a sold player, derived from the set it was auctioned in. */
 export function getCategoryFromPlayerData(playerData) {
   const setType = getSetTypeFromName(playerData.set);
   const parsed = parsePlayerEntry(playerData.fullEntry, setType);
   return tagToCategory(parsed.tag);
 }
 
+// =====================================================================
+// IDENTITY
+// =====================================================================
+
 export function getUserId() {
   let userId = localStorage.getItem('auctionUserId');
   if (!userId) {
-    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
     localStorage.setItem('auctionUserId', userId);
   }
   return userId;
@@ -273,6 +272,10 @@ export function generateRoomCode() {
   return code;
 }
 
+export function generatePlayerId() {
+  return Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+}
+
 export function toDisplayNameFromNormalized(normalizedName) {
   return String(normalizedName || '')
     .split(' ')
@@ -280,6 +283,10 @@ export function toDisplayNameFromNormalized(normalizedName) {
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 }
+
+// =====================================================================
+// PLAYER IMAGES
+// =====================================================================
 
 export function getPlayerImageUrl(playerName) {
   const cleanName = sanitizeDisplayPlayerName(playerName);
@@ -334,36 +341,56 @@ export function getImageNameCandidates(inputNames = []) {
   return candidates;
 }
 
-export function applyImageToneClass(element, preferredNames = []) {
-  if (!element) return;
-  let needsFix = false;
-  preferredNames.forEach(name => {
-    const normalized = normalizePlayerName(name);
-    if (whiteBackgroundPlayers.has(normalized)) {
-      needsFix = true;
-    }
-  });
-  element.classList.toggle('white-bg-fix', needsFix);
+export function needsWhiteBackgroundFix(preferredNames = []) {
+  return preferredNames.some(name => whiteBackgroundPlayers.has(normalizePlayerName(name)));
 }
 
 export function getNormalizedNameCandidates(name) {
   const normalized = normalizePlayerName(name);
   const candidates = [normalized];
 
-  if (playerNameAliases[normalized]) {
-    candidates.push(playerNameAliases[normalized]);
-  }
+  if (playerNameAliases[normalized]) candidates.push(playerNameAliases[normalized]);
 
   const compact = normalized.replace(/\s+/g, '');
   for (const [key, value] of Object.entries(playerNameAliases)) {
-    const keyCompact = key.replace(/\s+/g, '');
-    const valCompact = value.replace(/\s+/g, '');
-    if (keyCompact === compact) candidates.push(value);
-    if (valCompact === compact) candidates.push(key);
+    if (key.replace(/\s+/g, '') === compact) candidates.push(value);
+    if (value.replace(/\s+/g, '') === compact) candidates.push(key);
   }
 
   return [...new Set(candidates.filter(Boolean))];
 }
+
+function verifyImage(url) {
+  return new Promise(resolve => {
+    const testImg = new Image();
+    testImg.onload = () => resolve(true);
+    testImg.onerror = () => resolve(false);
+    testImg.src = url;
+  });
+}
+
+/**
+ * Walks the candidate URL list in order and resolves with the first one that
+ * actually loads, falling back to the IPL placeholder. Same probing order as
+ * the original setPlayerImageWithContext().
+ */
+export async function resolvePlayerImageUrl(preferredNames = [], playerContext = null) {
+  const uniqueNames = getImageNameCandidates(preferredNames);
+  const imageQueue = [
+    ...getPlayerHeadshotUrlsById(playerContext ? playerContext.playerId : null),
+    ...uniqueNames.map(getPlayerImageUrl),
+    PLAYER_PLACEHOLDER_IMAGE
+  ];
+  for (const url of imageQueue) {
+    // eslint-disable-next-line no-await-in-loop
+    if (await verifyImage(url)) return url;
+  }
+  return PLAYER_PLACEHOLDER_IMAGE;
+}
+
+// =====================================================================
+// AGE
+// =====================================================================
 
 export function isValidDob(dob) {
   if (!dob) return false;
@@ -382,71 +409,7 @@ export function calculateAge(dob) {
   const monthDiff = now.getUTCMonth() - birthDate.getUTCMonth();
   const dayDiff = now.getUTCDate() - birthDate.getUTCDate();
 
-  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-    age -= 1;
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) age -= 1;
 
   return age >= 0 ? age : null;
-}
-
-function verifyImage(url) {
-  return new Promise((resolve) => {
-    const testImg = new Image();
-    testImg.onload = () => resolve(true);
-    testImg.onerror = () => resolve(false);
-    testImg.src = url;
-  });
-}
-
-export function setPlayerImage(element, preferredNames = []) {
-  if (!element) return;
-  applyImageToneClass(element, preferredNames);
-  const uniqueNames = getImageNameCandidates(preferredNames);
-  const imageQueue = [...uniqueNames.map(getPlayerImageUrl), PLAYER_PLACEHOLDER_IMAGE];
-
-  let requestId = parseInt(element.dataset.imageRequestId || '0', 10) + 1;
-  element.dataset.imageRequestId = String(requestId);
-  const currentRequestId = element.dataset.imageRequestId;
-
-  (async () => {
-    for (const url of imageQueue) {
-      if (element.dataset.imageRequestId !== currentRequestId) return;
-      const ok = await verifyImage(url);
-      if (ok) { element.src = url; return; }
-    }
-    if (element.dataset.imageRequestId === currentRequestId) {
-      element.src = PLAYER_PLACEHOLDER_IMAGE;
-    }
-  })();
-
-  element.onerror = function() { this.onerror = null; this.src = PLAYER_PLACEHOLDER_IMAGE; };
-}
-
-export function setPlayerImageWithContext(element, preferredNames = [], playerContext = null) {
-  if (!element) return;
-  applyImageToneClass(element, preferredNames);
-
-  const uniqueNames = getImageNameCandidates(preferredNames);
-  const imageQueue = [
-    ...getPlayerHeadshotUrlsById(playerContext && playerContext.playerId ? playerContext.playerId : null),
-    ...uniqueNames.map(getPlayerImageUrl),
-    PLAYER_PLACEHOLDER_IMAGE
-  ];
-
-  let requestId = parseInt(element.dataset.imageRequestId || '0', 10) + 1;
-  element.dataset.imageRequestId = String(requestId);
-  const currentRequestId = element.dataset.imageRequestId;
-
-  (async () => {
-    for (const url of imageQueue) {
-      if (element.dataset.imageRequestId !== currentRequestId) return;
-      const ok = await verifyImage(url);
-      if (ok) { element.src = url; return; }
-    }
-    if (element.dataset.imageRequestId === currentRequestId) {
-      element.src = PLAYER_PLACEHOLDER_IMAGE;
-    }
-  })();
-
-  element.onerror = function() { this.onerror = null; this.src = PLAYER_PLACEHOLDER_IMAGE; };
 }

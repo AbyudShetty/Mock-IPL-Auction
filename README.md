@@ -1,8 +1,8 @@
 # 🐐 Goated Auction — Mock IPL Auction Simulator
 
-A feature-rich, real-time **IPL-style cricket auction simulator** you can play with friends online or locally on the same device. Built as a pure frontend web app hosted on Firebase, it features live player stats from IPL 2024–2026, Firebase-powered multiplayer rooms, and a full auction flow — from bidding to team management.
+A feature-rich, real-time **IPL-style cricket auction simulator** you can play with friends online or locally on the same device. React + Vite front end, Firebase Realtime Database for multiplayer sync, deployed on Firebase Hosting.
 
-![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-orange?logo=firebase) ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript) ![HTML5](https://img.shields.io/badge/HTML5-CSS3-blue?logo=html5) ![Hosted](https://img.shields.io/badge/Hosted-Firebase_Hosting-red)
+![React](https://img.shields.io/badge/React-18-61dafb?logo=react) ![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite) ![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-orange?logo=firebase) ![Hosted](https://img.shields.io/badge/Hosted-Firebase_Hosting-red)
 
 🔗 **Live App:** [goated-auction-2b1d8.web.app](https://goated-auction-2b1d8.web.app)
 
@@ -15,11 +15,12 @@ A feature-rich, real-time **IPL-style cricket auction simulator** you can play w
 - **200+ Real Players** — a full pool of IPL 2026 auction-eligible players, organized into 16 sets (Marquee, Wicketkeepers, Batsmen, Fast Bowlers, Spinners, All-rounders)
 - **Live Player Stats** — clicking a player shows their IPL batting and bowling stats for 2024, 2025, and 2026, plus full career numbers, pulled from official IPL data feeds
 - **Configurable Auction** — set your team count, team budget (default ₹120 Cr), minimum/maximum squad size, and player pool before the auction starts
-- **Custom Player Pool** — replace the default set with your own custom player list
+- **Custom Player Pool** — replace the default set with your own custom player list, drag to reorder sets
 - **Second-Round Unsold** — unsold players are automatically queued for a second round
-- **Team Management** — drag-and-drop to reorder your squad, inline team name editing, move players between teams
+- **Team Management** — drag-and-drop Playing XII builder, captain / vice-captain / keeper roles, inline team name editing, move players between teams
+- **Global Undo** — step back through sales and skips, refunding purses as it goes
 - **Celebration Animations** — confetti burst when a big buy lands
-- **Auction Statistics** — live tracking of most expensive player, total money spent, and total players sold
+- **Auction Statistics** — live tracking of most expensive player, total money spent, players sold, and spend per team
 - **Room Presence & Auto-Cleanup** — stale rooms (10+ minutes inactive, no one online) are automatically removed on new room creation
 
 ---
@@ -30,10 +31,10 @@ A feature-rich, real-time **IPL-style cricket auction simulator** you can play w
 
 1. Open the app and select **Online Multiplayer**
 2. One person selects **Create Room** and configures the auction (teams, budget, player mode)
-3. Share the 6-character room code with all participants
+3. Share the 6-character room code, or the `?room=CODE` link, with all participants
 4. Each participant selects **Join Room**, enters the code and their team name
 5. The room creator (Auctioneer) starts the auction and calls bids
-6. Teams place bids; the auctioneer hammers the final sale
+6. The auctioneer drags the player on the block onto the winning team and enters the price
 7. The auction proceeds set by set through all player groups
 
 ### Offline Local
@@ -44,52 +45,58 @@ A feature-rich, real-time **IPL-style cricket auction simulator** you can play w
 
 ---
 
-## 🏏 Player Pool
-
-Players are organized into **16 sets** auctioned in sequence:
-
-| Set | Example Players |
-|---|---|
-| Marquee Set | Virat Kohli, Jasprit Bumrah, Hardik Pandya, Ravindra Jadeja |
-| Wicket Keeper 1 | Rishabh Pant, MS Dhoni, Sanju Samson, Jos Buttler |
-| Batsman 1 | Rohit Sharma, Yashasvi Jaiswal, Shubman Gill, Travis Head |
-| Fast Bowler 1 | Mohammed Shami, Trent Boult, Kagiso Rabada, Jofra Archer |
-| Spinner 1 | Rashid Khan, Kuldeep Yadav, Yuzvendra Chahal, Varun Chakravarthy |
-| All-rounder 1 | Andre Russell, Sam Curran, Sunil Narine, Mitchell Marsh |
-| ... | 10 more sets of WKs, Batsmen, Bowlers, Spinners & All-rounders |
-
-✈️ denotes overseas players.
-
----
-
-## 📊 Player Stats
-
-Each player card shows:
-- **Recent seasons** — per-season batting (runs, SR, avg, 50s, 100s) and bowling (wickets, economy, avg, best figures) for IPL 2024, 2025, and 2026
-- **Career totals** — full IPL career aggregates
-- Stats are sourced from bundled JSON files (`official_ipl_2024_stats.json`, `official_ipl_2025_stats.json`, `official_ipl_2026_stats.json`, `official_ipl_career_stats.json`) and a supplementary CSV (`cricket_data_2026.csv`)
-
----
-
 ## 🗂️ Project Structure
 
 ```
-public/
-├── index.html                    # Main app (mode selection, setup, auction UI)
-├── script.js                     # All game logic, Firebase sync, stats rendering
-├── styles.css                    # Full UI styling
-├── players.html                  # Standalone player pool browser (by set/role)
-├── official_ipl_2024_stats.json  # Bundled IPL 2024 batting & bowling stats
-├── official_ipl_2025_stats.json  # Bundled IPL 2025 stats
-├── official_ipl_2026_stats.json  # Bundled IPL 2026 stats
-├── official_ipl_career_stats.json# Bundled IPL career stats
-├── cricket_data_2026.csv         # Supplementary per-season stats (2008–2026)
-├── firebase.json                 # Firebase Hosting config
-└── logo.png                      # App icon
-scripts/
-└── refresh_official_stats.py     # Script to refresh bundled stats from IPL feeds
-firebase.json                     # Root Firebase config
+index.html                     # Vite entry point
+vite.config.js
+firebase.json                  # Firebase Hosting (serves dist/, SPA rewrite)
+refresh_official_stats.py      # Refreshes the bundled stats snapshots
+
+public/                        # Copied verbatim into dist/
+├── logo.png
+├── cricket_data_2026.csv
+└── official_ipl_*.json        # Bundled IPL 2024/2025/2026 + career stats
+
+src/
+├── main.jsx                   # React root
+├── App.jsx                    # Screen router + always-mounted modals
+├── styles.css                 # Full UI styling (unchanged from the vanilla build)
+├── lib/                       # Framework-agnostic logic
+│   ├── config.js              # Default player pool, name aliases, feed URLs
+│   ├── utils.js               # Name parsing/normalising, image resolution, stat formatting
+│   ├── statsEngine.js         # Loads + merges official stat snapshots, builds table rows
+│   ├── celebration.js         # Confetti
+│   └── api.js                 # Client for the Cloud Functions API (AI seam)
+├── firebase/
+│   ├── client.js              # SDK init (env-driven config)
+│   └── rooms.js               # Every Realtime Database read/write
+├── store/
+│   ├── auctionStore.js        # Zustand store — the single source of truth
+│   └── selectors.js           # Derived state (team summaries, current player, stats)
+├── hooks/
+│   ├── useRoomSync.js         # Subscribes the store to rooms/{code}
+│   └── usePlayerImage.js      # Probes IPL headshot URLs
+├── screens/                   # ModeSelection, OnlineChoice, JoinRoom, WaitingLobby,
+│                              # InitialSetup, CustomPlayersSetup, AuctionRoom
+└── components/                # Team cards, panels, and modals/
+
+functions/                     # Firebase Cloud Functions (optional, see below)
+├── index.js                   # /health, /rooms/summary, /ai/scout
+└── package.json
 ```
+
+### Architecture notes
+
+The vanilla build used the DOM as its source of truth — purses were read back out of
+`<span class="purse-amount">`, squads out of `<li>` text. The React version inverts
+that: **`src/store/auctionStore.js` holds all state and the UI is a pure function of
+it.** Everything the team cards show (squad counts, nationality split, disqualification,
+purse colour) is derived in `src/store/selectors.js`.
+
+The Realtime Database schema under `rooms/{code}` is **unchanged**, so this version is
+wire-compatible with the old one. In an online room the auctioneer is authoritative for
+purses and squads; each owner is authoritative for their own Playing XII.
 
 ---
 
@@ -97,40 +104,82 @@ firebase.json                     # Root Firebase config
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vanilla HTML5, CSS3, ES6 JavaScript (modules) |
+| UI | React 18 |
+| Build | Vite 5 |
+| State | Zustand |
 | Realtime Sync | Firebase Realtime Database |
 | Hosting | Firebase Hosting |
+| Backend (optional) | Firebase Cloud Functions + Anthropic SDK |
 | Stats Source | IPL official stats feeds + bundled JSON/CSV |
-| Build | No build step — static files served directly |
 
 ---
 
 ## 🚀 Running Locally
 
-No build tools needed. Clone and open directly in a browser, or serve with any static server:
-
 ```bash
-git clone https://github.com/AbyudShetty/Mock-IPL-Auction.git
-cd Mock-IPL-Auction/public
-
-/* use your API KEY in index.html */
-
-# Option A: Python
-python3 -m http.server 8000
-
-# Option B: Node
-npx serve .
+npm install
+npm run dev          # http://localhost:5173
 ```
 
-Then open **http://localhost:8000**.
+Other scripts:
 
-> Online multiplayer uses the hosted Firebase project. To use your own Firebase backend, update the Firebase config in `index.html` and `script.js`.
+```bash
+npm run build        # production bundle into dist/
+npm run preview      # serve the built bundle
+npm run deploy       # build + firebase deploy --only hosting
+```
 
-### Refreshing Stats
+### Firebase configuration
 
-To pull fresh stats from the IPL feeds into the bundled JSON files:
+`src/firebase/client.js` falls back to the existing `goated-auction-2b1d8` project, so
+the app runs with no setup. To point it at your own project, copy `.env.example` to
+`.env` and fill in the `VITE_FIREBASE_*` values. (A Firebase web config is public by
+design — access control belongs in your Realtime Database rules.)
+
+### Deploying
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+`firebase.json` serves `dist/` with a SPA rewrite, so the `?room=CODE` share links work
+on any path.
+
+---
+
+## 🤖 Backend & AI (optional)
+
+`functions/` holds a Cloud Functions API with a `/ai/scout` endpoint that asks Claude
+for a bid/pass verdict on the player currently on the block. **It is deliberately not
+referenced from `firebase.json`**, so a plain `firebase deploy` stays a hosting-only
+deploy that works on the free Spark plan.
+
+To enable it:
+
+1. Upgrade the Firebase project to the **Blaze** plan (Cloud Functions requires it)
+2. `cd functions && npm install`
+3. `firebase functions:secrets:set ANTHROPIC_API_KEY`
+4. Add to `firebase.json`:
+   ```json
+   "functions": { "source": "functions" }
+   ```
+   and, inside `"hosting"`, put this rewrite **before** the catch-all:
+   ```json
+   { "source": "/api/**", "function": "api" }
+   ```
+5. `firebase deploy`
+
+The front end calls it through `src/lib/api.js`. With the rewrite in place requests are
+same-origin, so there is no CORS preflight and the API key never reaches the browser.
+
+---
+
+## 📊 Refreshing Stats
+
+Pulls fresh stats from the IPL feeds into `public/official_ipl_*.json`:
 
 ```bash
 pip install requests
-python scripts/refresh_official_stats.py
+python refresh_official_stats.py
 ```
